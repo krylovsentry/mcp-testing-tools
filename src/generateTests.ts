@@ -21,7 +21,7 @@ async function main(): Promise<void> {
 
   const child = spawn(
     process.execPath,
-    ["run", "src/index.ts", "--config", configPath, "--prompt", promptText],
+    ["run", "src/index.ts", "--config", configPath, "--disable-tools", "--prompt", promptText],
     { stdio: ["ignore", "pipe", "inherit"], shell: false }
   );
 

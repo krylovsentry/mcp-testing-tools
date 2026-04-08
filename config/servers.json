@@ -4,6 +4,8 @@
     "modelName": "deepseek-v3.1:671b-cloud",
     "baseUrl": "https://ollama.com",
     "apiKeyFile": "../.secrets/api-keys.json",
+    "supportsTools": true,
+    "supportsStreaming": true,
     "timeoutMs": 120000
   },
   "mcp": {

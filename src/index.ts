@@ -18,25 +18,34 @@ async function main(): Promise<void> {
   if (!prompt) {
     throw new Error('Missing required "--prompt" argument.');
   }
+  const disableTools = process.argv.includes("--disable-tools");
 
   const configPath = parseArg("--config") ?? "config/servers.json";
   console.error(`[app] loading config from ${configPath}`);
   const config = await loadConfig(configPath);
   console.error(`[app] model provider=${config.model.provider} model=${config.model.modelName} baseUrl=${config.model.baseUrl}`);
+  const effectiveDisableTools = disableTools || !config.model.supportsTools;
+  if (!config.model.supportsTools) {
+    console.error("[app] model.supportsTools=false, tool execution disabled by config");
+  }
   const manager = new ServerManager(config);
 
-  await manager.startAll();
+  if (!effectiveDisableTools) {
+    await manager.startAll();
+  }
   try {
     const gateway = new McpToolGateway(manager, config.agent.toolTimeoutMs);
     const provider = config.model.provider === "openaiCompat"
       ? new OpenAiCompatProvider(config.model)
       : new OllamaProvider(config.model);
     console.error("[app] starting agent loop");
-    const answer = await runToolCallingLoop(provider, gateway, config, prompt);
+    const answer = await runToolCallingLoop(provider, gateway, config, prompt, { disableTools: effectiveDisableTools });
     console.error("[app] agent loop completed");
     console.log(answer);
   } finally {
-    manager.stopAll();
+    if (!effectiveDisableTools) {
+      manager.stopAll();
+    }
   }
 }
 

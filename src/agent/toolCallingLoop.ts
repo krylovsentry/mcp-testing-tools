@@ -23,10 +23,11 @@ export async function runToolCallingLoop(
   provider: LlmProvider,
   toolGateway: McpToolGateway,
   config: AppConfig,
-  userPrompt: string
+  userPrompt: string,
+  options?: { disableTools?: boolean }
 ): Promise<string> {
   trace("input.userPrompt", userPrompt);
-  const tools = await toolGateway.refreshToolIndex();
+  const tools = options?.disableTools ? [] : await toolGateway.refreshToolIndex();
   trace("input.tools", tools.map((tool) => tool.name));
   const messages: ChatMessage[] = [
     { role: "system", content: systemPrompt() },
@@ -45,6 +46,13 @@ export async function runToolCallingLoop(
       lastText = response.text.trim();
     }
     if (response.toolCalls && response.toolCalls.length > 0) {
+      if (options?.disableTools) {
+        trace("loop.disableTools.ignoringToolCalls", response.toolCalls);
+        if (lastText) {
+          return lastText;
+        }
+        return "Model returned tool calls while tools are disabled. No text output produced.";
+      }
       const toolSignature = JSON.stringify(
         response.toolCalls.map((toolCall) => ({
           name: toolCall.name,

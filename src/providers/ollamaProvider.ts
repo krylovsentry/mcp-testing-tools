@@ -26,28 +26,31 @@ export class OllamaProvider implements LlmProvider {
     const startedAt = Date.now();
     try {
       trace(`request.start endpoint=${endpoint} model=${this.config.modelName} messages=${messages.length} tools=${tools.length} timeoutMs=${this.config.timeoutMs}`);
+      const payload: Record<string, unknown> = {
+        model: this.config.modelName,
+        messages: messages.map((message) => ({
+          role: message.role,
+          content: message.content
+        })),
+        stream: false
+      };
+      if (tools.length > 0) {
+        payload.tools = tools.map((tool) => ({
+          type: "function",
+          function: {
+            name: tool.name,
+            description: tool.description ?? "",
+            parameters: tool.inputSchema ?? { type: "object", properties: {} }
+          }
+        }));
+      }
       const res = await fetch(endpoint, {
         method: "POST",
         headers: {
           "content-type": "application/json",
           ...(this.config.apiKey ? { authorization: `Bearer ${this.config.apiKey}` } : {})
         },
-        body: JSON.stringify({
-          model: this.config.modelName,
-          messages: messages.map((message) => ({
-            role: message.role,
-            content: message.content
-          })),
-          tools: tools.map((tool) => ({
-            type: "function",
-            function: {
-              name: tool.name,
-              description: tool.description ?? "",
-              parameters: tool.inputSchema ?? { type: "object", properties: {} }
-            }
-          })),
-          stream: false
-        }),
+        body: JSON.stringify(payload),
         signal: controller.signal
       });
       const elapsedMs = Date.now() - startedAt;

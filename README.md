@@ -19,11 +19,18 @@ Bun-based local framework that:
 6. Run test-generation prompt from file:
    - `bun run generate:tests`
    - dry run (parse only, no file writes): `bun run generate:tests -- --dry-run`
+   - Note: generation runs with `--disable-tools` so model focuses on writing `FILE:` blocks instead of calling Playwright/Postman tools.
+7. Run model-only checks one by one (no MCP tools):
+   - `bun run model:test`
+   - custom cases file: `bun run model:test -- --cases prompts/model-test-cases.json`
 
 ## Model providers
 
 - `openaiCompat`: uses `POST {baseUrl}/v1/chat/completions`
 - `ollama`: uses `POST {baseUrl}/api/chat`
+- Model capability flags in config:
+  - `model.supportsTools`: enable/disable MCP tool calls for this model
+  - `model.supportsStreaming`: documented capability flag for endpoint behavior
 
 ### Ollama config examples
 
@@ -62,6 +69,7 @@ Each server (`playwright`, `postman`) supports:
 - Dev trace mode: set `DEV_TRACE=1` to log prompt input, model outputs, and tool outputs (truncated).
 - Model fetch trace mode: set `MODEL_TRACE=1` (or `DEV_TRACE=1`) to log model request start/response/error timing and parse mode.
 - `generate:tests` writes real files from model output when the model uses fenced blocks with `FILE: relative/path`.
+- `model:test` runs prompts sequentially and reports PASS/FAIL per case.
 
 ## Troubleshooting
 
@@ -75,5 +83,6 @@ Each server (`playwright`, `postman`) supports:
   - check `tools/list` support in MCP server and server startup success.
 - Model errors:
   - verify `baseUrl`, `modelName`, and model service health.
+  - if model does not reliably support function/tool calling, set `model.supportsTools` to `false`.
 - Bun command missing:
   - install Bun and reopen terminal.

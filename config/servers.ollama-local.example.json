@@ -3,6 +3,8 @@
     "provider": "ollama",
     "modelName": "llama3.1",
     "baseUrl": "http://127.0.0.1:11434",
+    "supportsTools": false,
+    "supportsStreaming": true,
     "timeoutMs": 60000
   },
   "mcp": {

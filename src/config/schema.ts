@@ -37,6 +37,8 @@ const modelConfigSchema = z.object({
   baseUrl: z.string().url(),
   apiKey: z.string().optional(),
   apiKeyFile: z.string().optional(),
+  supportsTools: z.boolean().default(true),
+  supportsStreaming: z.boolean().default(true),
   timeoutMs: z.number().int().positive().default(60_000)
 });
 
