@@ -37,7 +37,8 @@ const modelConfigSchema = z.object({
   baseUrl: z.string().url(),
   apiKey: z.string().optional(),
   apiKeyFile: z.string().optional(),
-  supportsTools: z.boolean().default(true),
+  /** When false, MCP tool calls are disabled for this model (same as CLI --disable-tools). */
+  tools: z.boolean().default(true),
   supportsStreaming: z.boolean().default(true),
   timeoutMs: z.number().int().positive().default(60_000)
 });
@@ -59,8 +60,25 @@ export const appConfigSchema = z.object({
 
 export type AppConfig = z.infer<typeof appConfigSchema>;
 
+/** Merge deprecated `supportsTools` into `tools` if `tools` is omitted; `tools` wins when both are set. */
+export function normalizeModelConfig(model: Record<string, unknown>): Record<string, unknown> {
+  const { supportsTools, ...rest } = model;
+  let tools = true;
+  if (typeof model.tools === "boolean") {
+    tools = model.tools;
+  } else if (typeof supportsTools === "boolean") {
+    tools = supportsTools;
+  }
+  return { ...rest, tools };
+}
+
 export function parseConfig(raw: unknown): AppConfig {
-  return appConfigSchema.parse(raw);
+  const obj = raw as Record<string, unknown>;
+  const model = obj.model;
+  if (model && typeof model === "object" && !Array.isArray(model)) {
+    obj.model = normalizeModelConfig(model as Record<string, unknown>);
+  }
+  return appConfigSchema.parse(obj);
 }
 
 export async function loadConfig(path = "config/servers.json"): Promise<AppConfig> {

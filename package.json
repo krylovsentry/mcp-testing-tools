@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "bun run src/index.ts",
-    "test": "bun test",
+    "test": "bun test tests",
     "smoke": "bun run src/smoke.ts",
     "generate:tests": "bun run src/generateTests.ts",
     "model:test": "bun run src/modelTests.ts"

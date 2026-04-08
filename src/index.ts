@@ -24,9 +24,9 @@ async function main(): Promise<void> {
   console.error(`[app] loading config from ${configPath}`);
   const config = await loadConfig(configPath);
   console.error(`[app] model provider=${config.model.provider} model=${config.model.modelName} baseUrl=${config.model.baseUrl}`);
-  const effectiveDisableTools = disableTools || !config.model.supportsTools;
-  if (!config.model.supportsTools) {
-    console.error("[app] model.supportsTools=false, tool execution disabled by config");
+  const effectiveDisableTools = disableTools || !config.model.tools;
+  if (!config.model.tools) {
+    console.error("[app] model.tools=false, tool execution disabled by config");
   }
   const manager = new ServerManager(config);
 

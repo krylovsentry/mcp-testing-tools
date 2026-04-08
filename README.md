@@ -29,7 +29,8 @@ Bun-based local framework that:
 - `openaiCompat`: uses `POST {baseUrl}/v1/chat/completions`
 - `ollama`: uses `POST {baseUrl}/api/chat`
 - Model capability flags in config:
-  - `model.supportsTools`: enable/disable MCP tool calls for this model
+  - `model.tools`: enable/disable MCP tool calls for this model (`true` / `false`)
+  - Deprecated alias: `model.supportsTools` — used only if `tools` is omitted; if both are set, **`tools` wins**
   - `model.supportsStreaming`: documented capability flag for endpoint behavior
 
 ### Ollama config examples
@@ -83,6 +84,6 @@ Each server (`playwright`, `postman`) supports:
   - check `tools/list` support in MCP server and server startup success.
 - Model errors:
   - verify `baseUrl`, `modelName`, and model service health.
-  - if model does not reliably support function/tool calling, set `model.supportsTools` to `false`.
+  - if model does not reliably support function/tool calling, set `model.tools` to `false`.
 - Bun command missing:
   - install Bun and reopen terminal.

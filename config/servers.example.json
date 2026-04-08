@@ -4,7 +4,7 @@
     "modelName": "llama3.1",
     "baseUrl": "http://127.0.0.1:11434",
     "apiKey": "",
-    "supportsTools": true,
+    "tools": true,
     "supportsStreaming": true,
     "timeoutMs": 60000
   },

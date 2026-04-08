@@ -4,7 +4,7 @@
     "modelName": "deepseek-v3.1:671b-cloud",
     "baseUrl": "https://your-ollama-cloud-endpoint",
     "apiKeyFile": "../.secrets/api-keys.json",
-    "supportsTools": false,
+    "tools": false,
     "supportsStreaming": true,
     "timeoutMs": 120000
   },
